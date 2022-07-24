@@ -41,7 +41,6 @@ Ddelay = 15;
 floorsig = sim("floorsignal.slx", 5);
 sim("Suspension_System.slx", 5);
 
-
 %% Path Planning
 t = 0;
 % Drive left for 15m, driving backwards
@@ -77,15 +76,14 @@ v_right = [v_right, v_r];
 t = t + t_new;
 
 % %Stop
-[v_l, v_r, t_new] = path_stop(24*(0.46), 5)
+[v_l, v_r, t_new] = path_stop(24*(0.46), 5);
 v_left = [v_left, v_l];
 v_right = [v_right, v_r];
  t = t + t_new;
-% 
-% 
-% % Generate total time and timeseries:
+
+% Generate total time and timeseries:
 timescale = linspace(0, t, length(v_right));
-% 
+
 % Assuming starting pointing in poositive x direction
 % t = linspace(0,100,1000);
 % v_l = [linspace(0,20,400), linspace(0,0,40), linspace(3.52,3.52,50), linspace(0,0,30), linspace(20,20,480)];
@@ -98,11 +96,12 @@ path = sim("WheelDriveModel.slx", 100);
 
 function [v_path_left, v_path_right, turn_time] = path_rot(target_angle, CW, right_voltage_start, left_voltage_start)
     accel_time = 5;
-    turning_vel = 11.25000001; % deg/s
+    turning_vel = 11.735; % deg/s
     accel_rot = accel_time*turning_vel/2;
     deccel_time = 5;
     deccel_rot = accel_time*turning_vel/2;
     turning_voltage = 5;
+    time_scaler = 100; % 1/s
 
     if CW
         right_voltage = -turning_voltage + right_voltage_start;
@@ -113,29 +112,30 @@ function [v_path_left, v_path_right, turn_time] = path_rot(target_angle, CW, rig
     end
 
     % acel
-    v_path_left = linspace(left_voltage_start, left_voltage, accel_time);
-    v_path_right = linspace(right_voltage_start, right_voltage, accel_time);
+    v_path_left = linspace(left_voltage_start, left_voltage, accel_time*time_scaler);
+    v_path_right = linspace(right_voltage_start, right_voltage, accel_time*time_scaler);
     
     % Hold
     dist_full_speed = abs(target_angle) - accel_rot - deccel_rot;
     time_full_speed = dist_full_speed / turning_vel;
-    v_path_left = [v_path_left, linspace(left_voltage, left_voltage, time_full_speed)];
-    v_path_right = [v_path_right, linspace(right_voltage, right_voltage, time_full_speed)];
+    v_path_left = [v_path_left, linspace(left_voltage, left_voltage, time_full_speed*time_scaler)];
+    v_path_right = [v_path_right, linspace(right_voltage, right_voltage, time_full_speed*time_scaler)];
     
     % Decelerate
-    v_path_left = [v_path_left, linspace(left_voltage, left_voltage_start, deccel_time)];
-    v_path_right = [v_path_right, linspace(right_voltage, right_voltage_start, deccel_time)];
+    v_path_left = [v_path_left, linspace(left_voltage, left_voltage_start, deccel_time*time_scaler)];
+    v_path_right = [v_path_right, linspace(right_voltage, right_voltage_start, deccel_time*time_scaler)];
    
     turn_time = accel_time + time_full_speed + deccel_time;
 end
 
-function [v_path_left, v_path_right, turn_time] = path_linear(target_distance, Forwards, right_voltage_start, left_voltage_start)
-    drive_vel = 1.054;
+function [v_path_left, v_path_right, path_time] = path_linear(target_distance, Forwards, right_voltage_start, left_voltage_start)
+    drive_vel = 1.02;
     accel_time = 5;
     accel_dist = accel_time*drive_vel/2;
     deccel_time =  5;
     deccel_dist = deccel_time*drive_vel/2;
     drive_voltage = 24;
+    time_scaler = 100; % 1/s
 
     if Forwards
         right_voltage = drive_voltage + right_voltage_start;
@@ -145,26 +145,26 @@ function [v_path_left, v_path_right, turn_time] = path_linear(target_distance, F
         left_voltage = -drive_voltage + left_voltage_start;
     end
     % Accel
-    v_path_left = linspace(left_voltage_start, left_voltage, accel_time);
-    v_path_right = linspace(right_voltage_start, right_voltage, accel_time);
+    v_path_left = linspace(left_voltage_start, left_voltage, accel_time*time_scaler);
+    v_path_right = linspace(right_voltage_start, right_voltage, accel_time*time_scaler);
     
     % Hold
     dist_full_speed = abs(target_distance) - accel_dist - deccel_dist;
     time_full_speed = dist_full_speed / drive_vel;
-    v_path_left = [v_path_left, linspace(left_voltage, left_voltage, time_full_speed)];
-    v_path_right = [v_path_right, linspace(right_voltage, right_voltage, time_full_speed)];
+    v_path_left = [v_path_left, linspace(left_voltage, left_voltage, time_full_speed*time_scaler)];
+    v_path_right = [v_path_right, linspace(right_voltage, right_voltage, time_full_speed*time_scaler)];
     
     % Decelerate
-    v_path_left = [v_path_left, linspace(left_voltage, abs(left_voltage*0.46), deccel_time)];
-    v_path_right = [v_path_right, linspace(right_voltage, abs(right_voltage*0.46), deccel_time)];
-    turn_time = accel_time + time_full_speed + deccel_time;
-
+    v_path_left = [v_path_left, linspace(left_voltage, abs(left_voltage*0.46), deccel_time*time_scaler)];
+    v_path_right = [v_path_right, linspace(right_voltage, abs(right_voltage*0.46), deccel_time*time_scaler)];
+    path_time = accel_time + time_full_speed + deccel_time;
 
 end
 
 function [v_path_left, v_path_right, turn_time] = path_stop(volt_stop, time_stop)
-    v_path_left = linspace(volt_stop, volt_stop, time_stop);
-    v_path_right = linspace(volt_stop, volt_stop, time_stop);
+    time_scaler = 100; % 1/s
+
+    v_path_left = linspace(volt_stop, volt_stop, time_stop*time_scaler);
+    v_path_right = linspace(volt_stop, volt_stop, time_stop*time_scaler);
     turn_time = time_stop;
 end
-
