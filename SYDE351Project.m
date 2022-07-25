@@ -33,7 +33,7 @@ Hgroove = 0.005;
 %note - these values are actually the distance travelled
 Ddoor = 0.05;
 Hdoor = 0.03;
-Ddelay = 15;
+Ddelay = 0;
 
 %% Robot Motion Parameters (Tune the robot motion here)
 % %Tune the parameters found in the path generation functions at the end of
