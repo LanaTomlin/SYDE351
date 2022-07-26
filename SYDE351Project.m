@@ -1,6 +1,6 @@
 %% Global Parameters
 mass = 20; %kg
-mass_loaded = 40; %kg
+mass_loaded = 20; %kg
 
 %% Motor Parameters
 La = 0.15*10^-3;
@@ -13,7 +13,7 @@ Cshaft = 1;
 %% Suspension Parameters
 c = 10;
 k = 10;
-speed = 1; %m/s
+speed = 0.508; %m/s
 
 wheel_separation = 0.5; %m
 wheel_radius = 0.01; %m
@@ -36,10 +36,10 @@ Ddelay = 0;
 %% Robot Motion Parameters (Tune the robot motion here)
 % %Tune the parameters found in the path generation functions at the end of
 %this file
-floorsig = sim("floorsignal.slx", 5);
-doorsig = sim("DoorSignal.slx", 5.1);
+floorsig = sim("floorsignal.slx", 5/speed);
+doorsig = sim("DoorSignal.slx", 5/speed + 0.2);
 
-sim("Suspension_System.slx", 5.2);
+sim("Suspension_System.slx", 5/speed + 0.3);
 
 
 
