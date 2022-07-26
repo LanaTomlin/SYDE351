@@ -100,10 +100,10 @@ right_motor_voltage = timeseries(v_right, timescale);
 path = sim("WheelDriveModel.slx", 100);
 
 function [v_path_left, v_path_right, turn_time] = path_rot(target_angle, CW)
-    accel_time = 0.55;
+    accel_time = 0.05;
     turning_vel = 65.32; % deg/s
     accel_rot = accel_time*turning_vel/2;
-    deccel_time = 0.55;
+    deccel_time = 0.05;
     deccel_rot = accel_time*turning_vel/2;
     turning_voltage = 5;
     time_scaler = 100; % 1/s
@@ -135,9 +135,9 @@ end
 
 function [v_path_left, v_path_right, path_time] = path_linear(target_distance, Forwards)
     drive_vel = 0.405;
-    accel_time = 2.4;
+    accel_time = 1.4;
     accel_dist = 0.5;
-    deccel_time =  2.4;
+    deccel_time =  1.4;
     deccel_dist = 0.5;
     drive_voltage = 24;
     time_scaler = 100; % 1/s
@@ -160,8 +160,8 @@ function [v_path_left, v_path_right, path_time] = path_linear(target_distance, F
     v_path_right = [v_path_right, linspace(right_voltage, right_voltage, time_full_speed*time_scaler)];
     
     % Decelerate
-    v_path_left = [v_path_left, linspace(left_voltage, abs(left_voltage*0.46), deccel_time*time_scaler)];
-    v_path_right = [v_path_right, linspace(right_voltage, abs(right_voltage*0.46), deccel_time*time_scaler)];
+    v_path_left = [v_path_left, linspace(left_voltage, 0, deccel_time*time_scaler)];
+    v_path_right = [v_path_right, linspace(right_voltage, 0, deccel_time*time_scaler)];
     path_time = accel_time + time_full_speed + deccel_time;
 
 end
