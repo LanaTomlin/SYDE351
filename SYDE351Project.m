@@ -8,20 +8,18 @@ Ra = 0.035;
 Kt = 8*10^-3;
 Kb = 8*10^-3;
 If = 1.15;
-Cshaft = 10;
-
-
+Cshaft = 1;
 
 %% Suspension Parameters
 c = 100;
-k = 10000;
+k = 1000;
 speed = 1; %m/s
 
 wheel_separation = 0.5; %m
 wheel_radius = 0.01; %m
 
-input_torque = 9.8*mass_loaded*wheel_radius*0.6;
-gear_ratio = input_torque/(17.5*10^-3);
+input_torque = 0; % No additional load other than mechanical resistance.
+gear_ratio = 3;
 
 %% Floor parameters
 %note - these values are actually the distance travelled
@@ -54,12 +52,24 @@ v_left = v_l;
 v_right = v_r;
 t = t + t_new;
 
+% %Stop
+[v_l, v_r, t_new] = path_stop(0, 5);
+v_left = [v_left, v_l];
+v_right = [v_right, v_r];
+ t = t + t_new;
+
 % Rotate 90 deg CCW
-[v_l, v_r, t_new] = path_rot(90, true);
+[v_l, v_r, t_new] = path_rot(90, false);
 % Accelerate
 v_left = [v_left, v_l];
 v_right = [v_right, v_r];
 t = t + t_new;
+
+% %Stop
+[v_l, v_r, t_new] = path_stop(0, 5);
+v_left = [v_left, v_l];
+v_right = [v_right, v_r];
+ t = t + t_new;
  
 %  % Move 10m Foreward
 [v_l, v_r, t_new] = path_linear(10, true);
@@ -67,12 +77,24 @@ v_left = [v_left, v_l];
 v_right = [v_right, v_r];
 t = t + t_new;
 
+% %Stop
+[v_l, v_r, t_new] = path_stop(0, 5);
+v_left = [v_left, v_l];
+v_right = [v_right, v_r];
+ t = t + t_new;
+
 % % Rotate 90 deg CW
-[v_l, v_r, t_new] = path_rot(90, false);
+[v_l, v_r, t_new] = path_rot(90, true);
 % Accelerate
 v_left = [v_left, v_l];
 v_right = [v_right, v_r];
 t = t + t_new;
+
+% %Stop
+[v_l, v_r, t_new] = path_stop(0, 5);
+v_left = [v_left, v_l];
+v_right = [v_right, v_r];
+ t = t + t_new;
 
 % % Move 8m Foreward
 [v_l, v_r, t_new] = path_linear(8, true);
@@ -97,14 +119,14 @@ timescale = linspace(0, t, length(v_right));
 left_motor_voltage = timeseries(v_left, timescale);
 right_motor_voltage = timeseries(v_right, timescale);
 
-path = sim("WheelDriveModel.slx", 100);
+path = sim("WheelDriveModel.slx", 1000);
 
 function [v_path_left, v_path_right, turn_time] = path_rot(target_angle, CW)
-    accel_time = 0.05;
-    turning_vel = 65.32; % deg/s
-    accel_rot = accel_time*turning_vel/2;
-    deccel_time = 0.05;
-    deccel_rot = accel_time*turning_vel/2;
+    accel_time = 3;
+    turning_vel = 63.17; % deg/s
+    accel_rot = 21;
+    deccel_time = 3;
+    deccel_rot = 21;
     turning_voltage = 5;
     time_scaler = 100; % 1/s
 
@@ -134,11 +156,11 @@ function [v_path_left, v_path_right, turn_time] = path_rot(target_angle, CW)
 end
 
 function [v_path_left, v_path_right, path_time] = path_linear(target_distance, Forwards)
-    drive_vel = 0.405;
-    accel_time = 1.4;
-    accel_dist = 0.5;
-    deccel_time =  1.4;
-    deccel_dist = 0.5;
+    drive_vel = 0.508;
+    accel_time = 7;
+    accel_dist = 2.1;
+    deccel_time = 7;
+    deccel_dist = 1.28;
     drive_voltage = 24;
     time_scaler = 100; % 1/s
 
