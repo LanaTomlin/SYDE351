@@ -11,8 +11,8 @@ If = 1.15;
 Cshaft = 1;
 
 %% Suspension Parameters
-c = 100;
-k = 1000;
+c = 10;
+k = 10;
 speed = 1; %m/s
 
 wheel_separation = 0.5; %m
@@ -39,7 +39,7 @@ Ddelay = 0;
 floorsig = sim("floorsignal.slx", 5);
 doorsig = sim("DoorSignal.slx", 5.1);
 
-sim("Suspension_System.slx", 5.5);
+sim("Suspension_System.slx", 5.2);
 
 
 
